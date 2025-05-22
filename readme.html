@@ -1,65 +1,134 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Página en Mantenimiento</title>
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #f2f2f2;
-      color: #333;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      text-align: center;
-    }
-
-    img {
-      max-width: 200px;
-      margin-bottom: 30px;
-    }
-
-    h1 {
-      font-size: 48px;
-      margin-bottom: 10px;
-      color: #005baa;
-    }
-
-    p {
-      font-size: 20px;
-      margin-bottom: 30px;
-    }
-
-    a.boton {
-      display: inline-block;
-      background-color: #005baa;
-      color: #fff;
-      padding: 12px 24px;
-      text-decoration: none;
-      border-radius: 8px;
-      font-weight: bold;
-      transition: background-color 0.3s ease;
-    }
-
-    a.boton:hover {
-      background-color: #003f7f;
-    }
-  </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sistema de Recordatorio Gerencial - Amauta (SRG)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
+<body class="bg-gray-100 min-h-screen">
+  <!-- Título global centrado -->
+  <div class="text-center py-4">
+    <h1 class="text-4xl font-bold text-blue-900">Sistema de Recordatorio Gerencial - Amauta (SRG)</h1>
+  </div>
 
-  <!-- Cambia esta línea con la URL de tu logo -->
-  <img src="ruta-de-tu-logo.png" alt="Logo de la institución">
+  <!-- Pantalla de inicio de sesión -->
+  <div id="loginScreen" class="flex flex-col items-center justify-center h-screen">
+    <div class="bg-white p-6 rounded-xl shadow-md w-11/12 max-w-sm text-center">
+      <img src="logo.png" alt="Logo" class="mx-auto mb-4" style="max-height: 80px;" />
+      <input id="usuario" type="text" placeholder="Usuario" class="w-full mb-2 p-2 border rounded" />
+      <input id="contrasena" type="password" placeholder="Contraseña" class="w-full mb-4 p-2 border rounded" />
+      <button onclick="iniciarSesion()" class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">Ingresar</button>
+    </div>
+  </div>
 
-  <h1>PÁGINA EN MANTENIMIENTO</h1>
-  <p>Estamos trabajando para darte lo mejor. ¡Gracias por tu paciencia!</p>
+  <!-- Sistema principal -->
+  <div id="mainApp" class="hidden p-4">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
+      <div>
+        <p class="text-sm">🔓 Ojo cerrado: sin enlace</p>
+        <p class="text-sm">👁️ Ojo abierto: enlace presente</p>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        <select id="filtroUrgencia" onchange="filtrar()" class="p-2 rounded border">
+          <option value="">Urgencia</option>
+          <option value="Urgente">Urgente</option>
+          <option value="Moderado">Moderado</option>
+        </select>
+        <select id="filtroMes" onchange="filtrar()" class="p-2 rounded border">
+          <option value="">Mes</option>
+          <option>Enero</option>
+          <option>Febrero</option>
+          <option>Marzo</option>
+          <option>Abril</option>
+        </select>
+        <select id="filtroPersona" onchange="filtrar()" class="p-2 rounded border">
+          <option value="">Persona</option>
+          <option>José</option>
+          <option>Ana</option>
+          <option>Carlos</option>
+        </select>
+      </div>
+    </div>
 
-  <!-- Cambia el enlace aquí abajo con el enlace real a Q10 o lo que desees -->
-  <a class="boton" href="https://tu-enlace-a-q10.com" target="_blank">Ingresar a Q10</a>
+    <div class="overflow-x-auto">
+      <table class="min-w-full bg-white rounded-xl shadow-md">
+        <thead>
+          <tr class="bg-gray-200 text-sm">
+            <th class="p-2">#</th>
+            <th class="p-2">Actividad</th>
+            <th class="p-2">Estado</th>
+            <th class="p-2">Urgencia</th>
+            <th class="p-2">Mes</th>
+            <th class="p-2">Persona</th>
+            <th class="p-2">Asignación</th>
+            <th class="p-2">Vencimiento</th>
+            <th class="p-2">Observación</th>
+            <th class="p-2">Enlace</th>
+          </tr>
+        </thead>
+        <tbody id="tablaBody" class="text-sm">
+          <!-- Datos precargados -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+<script>
+  const datos = [
+    { id: 1, actividad: "Enviar informe mensual", estado: "Pendiente", urgencia: "Urgente", mes: "Abril", persona: "José", asignacion: "2025-05-01", vencimiento: "2025-05-05", observacion: "Enviar antes del cierre", link: "https://ejemplo.com/informe" },
+    { id: 2, actividad: "Reunión con equipo TI", estado: "Listo", urgencia: "Moderado", mes: "Marzo", persona: "Ana", asignacion: "2025-03-10", vencimiento: "2025-03-15", observacion: "Coordinar sala", link: "" },
+    { id: 3, actividad: "Actualizar plan estratégico", estado: "Pendiente", urgencia: "Urgente", mes: "Abril", persona: "Carlos", asignacion: "2025-04-01", vencimiento: "2025-04-10", observacion: "Versión 2.1", link: "https://ejemplo.com/plan" },
+    { id: 4, actividad: "Capacitación interna", estado: "Pendiente", urgencia: "Moderado", mes: "Enero", persona: "José", asignacion: "2025-01-05", vencimiento: "2025-01-20", observacion: "Área de sistemas", link: "" },
+  ];
+
+  function iniciarSesion() {
+    const user = document.getElementById('usuario').value;
+    const pass = document.getElementById('contrasena').value;
+    if (user === 'admin' && pass === '1234') {
+      document.getElementById('loginScreen').classList.add('hidden');
+      document.getElementById('mainApp').classList.remove('hidden');
+      cargarTabla();
+    } else {
+      alert('Credenciales incorrectas.');
+    }
+  }
+
+  function cargarTabla(filtrado = datos) {
+    const tbody = document.getElementById('tablaBody');
+    tbody.innerHTML = '';
+    filtrado.forEach((d) => {
+      const enlace = d.link ? `<a href="${d.link}" target="_blank" class="bg-blue-500 text-white px-2 py-1 rounded text-sm hover:bg-blue-600">👁️</a>` : `<span class="bg-gray-400 text-white px-2 py-1 rounded text-sm">🔓</span>`;
+      const fila = `
+        <tr class="text-center border-t">
+          <td class="p-2">${d.id}</td>
+          <td class="p-2">${d.actividad}</td>
+          <td class="p-2">${d.estado}</td>
+          <td class="p-2">${d.urgencia}</td>
+          <td class="p-2">${d.mes}</td>
+          <td class="p-2">${d.persona}</td>
+          <td class="p-2">${d.asignacion}</td>
+          <td class="p-2">${d.vencimiento}</td>
+          <td class="p-2">${d.observacion}</td>
+          <td class="p-2">${enlace}</td>
+        </tr>
+      `;
+      tbody.innerHTML += fila;
+    });
+  }
+
+  function filtrar() {
+    const urg = document.getElementById('filtroUrgencia').value;
+    const mes = document.getElementById('filtroMes').value;
+    const persona = document.getElementById('filtroPersona').value;
+    const resultado = datos.filter(d =>
+      (!urg || d.urgencia === urg) &&
+      (!mes || d.mes === mes) &&
+      (!persona || d.persona === persona)
+    );
+    cargarTabla(resultado);
+  }
+</script>
 
 </body>
 </html>
